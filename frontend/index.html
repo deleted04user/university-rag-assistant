@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portail universitaire — Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">Université — Portail étudiant</div>
+      <div class="header-actions">
+        <span id="user-pill" class="user-pill hidden"></span>
+        <button type="button" class="btn btn-ghost hidden" id="btn-admin">Administration</button>
+        <button type="button" class="btn btn-ghost hidden" id="btn-logout">Déconnexion</button>
+        <button type="button" class="btn btn-primary" id="btn-login">Connexion</button>
+        <button type="button" class="btn btn-ghost" id="btn-register">Inscription</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel hidden" data-view="login">
+        <h2>Connexion</h2>
+        <form id="form-login">
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input id="login-email" name="email" type="email" required autocomplete="username" />
+          </div>
+          <div class="field">
+            <label for="login-password">Mot de passe</label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Se connecter</button>
+        </form>
+        <p style="margin-top: 1rem; color: var(--muted); font-size: 0.9rem">
+          Démo : <code>student@univ-demo.fr</code> / <code>student123</code> — Admin :
+          <code>admin@univ-demo.fr</code> / <code>admin123</code>
+        </p>
+      </section>
+
+      <section class="panel hidden" data-view="register">
+        <h2>Créer un compte</h2>
+        <form id="form-register">
+          <div class="field">
+            <label for="reg-name">Nom complet</label>
+            <input id="reg-name" name="full_name" required />
+          </div>
+          <div class="field">
+            <label for="reg-email">Email</label>
+            <input id="reg-email" name="email" type="email" required autocomplete="username" />
+          </div>
+          <div class="field">
+            <label for="reg-password">Mot de passe (6 caractères min.)</label>
+            <input
+              id="reg-password"
+              name="password"
+              type="password"
+              minlength="6"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">S’inscrire</button>
+        </form>
+      </section>
+
+      <section class="panel hidden" data-view="formations">
+        <div class="tabs">
+          <button type="button" class="tab active" data-tab="formations">Formations</button>
+          <button type="button" class="tab" data-tab="horaires">Horaires</button>
+          <button type="button" class="tab" data-tab="chat">Assistant</button>
+        </div>
+        <h2>Formations disponibles</h2>
+        <div id="formations-list"></div>
+      </section>
+
+      <section class="panel hidden" data-view="horaires">
+        <div class="tabs">
+          <button type="button" class="tab" data-tab="formations">Formations</button>
+          <button type="button" class="tab active" data-tab="horaires">Horaires</button>
+          <button type="button" class="tab" data-tab="chat">Assistant</button>
+        </div>
+        <h2>Horaires des cours</h2>
+        <div class="inline-form" style="margin-bottom: 1rem">
+          <div class="field">
+            <label for="horaire-filter">Filtrer (module)</label>
+            <input id="horaire-filter" type="search" placeholder="ex. Java, INF301" />
+          </div>
+          <button type="button" class="btn btn-primary" id="horaire-filter-btn">Rechercher</button>
+        </div>
+        <div id="horaires-list"></div>
+      </section>
+
+      <section class="panel hidden" data-view="chat">
+        <div class="tabs">
+          <button type="button" class="tab" data-tab="formations">Formations</button>
+          <button type="button" class="tab" data-tab="horaires">Horaires</button>
+          <button type="button" class="tab active" data-tab="chat">Assistant</button>
+        </div>
+        <h2>Assistant intelligent</h2>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0">
+          Posez une question sur les formations, horaires, inscription ou services. Réponses basées sur
+          la base de connaissances.
+        </p>
+        <div id="chat-log" class="chat-log"></div>
+        <div id="chat-recommendations"></div>
+        <div class="inline-form">
+          <div class="field" style="flex: 3">
+            <label for="chat-input">Votre question</label>
+            <input id="chat-input" type="text" placeholder="Ex. Quels sont les horaires du module Java ?" />
+          </div>
+          <button type="button" class="btn btn-primary" id="chat-send">Envoyer</button>
+        </div>
+      </section>
+
+      <section class="panel hidden" data-view="admin">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem">
+          <h2 style="margin: 0">Back-office</h2>
+          <button type="button" class="btn btn-ghost" id="admin-back">Retour portail</button>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1rem">
+          <div class="panel" style="margin: 0">
+            <h2>Statistiques chatbot</h2>
+            <div id="admin-stats">—</div>
+            <p style="margin-top: 0.75rem">
+              <button type="button" class="btn btn-primary" id="admin-rag-reindex">
+                Réindexer RAG (après ajout formations / horaires / infos)
+              </button>
+            </p>
+          </div>
+          <div class="panel" style="margin: 0">
+            <h2>Ajouter une formation</h2>
+            <form id="form-admin-formation">
+              <div class="field">
+                <label>Code</label>
+                <input name="code" required />
+              </div>
+              <div class="field">
+                <label>Titre</label>
+                <input name="title" required />
+              </div>
+              <div class="field">
+                <label>Description</label>
+                <textarea name="description"></textarea>
+              </div>
+              <div class="field">
+                <label>Durée (semestres)</label>
+                <input name="duration_semesters" type="number" min="1" value="6" />
+              </div>
+              <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Utilisateurs</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Email</th>
+                  <th>Nom</th>
+                  <th>Rôle</th>
+                  <th>Actif</th>
+                  <th>Modifier rôle</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel" style="margin: 0">
+            <h2>Nouvel horaire</h2>
+            <form id="form-admin-horaire">
+              <div class="field">
+                <label>Formation (optionnel)</label>
+                <select name="formation_id" id="horaire-formation-id"></select>
+              </div>
+              <div class="field">
+                <label>Code module</label>
+                <input name="module_code" required />
+              </div>
+              <div class="field">
+                <label>Nom module</label>
+                <input name="module_name" required />
+              </div>
+              <div class="field">
+                <label>Jour</label>
+                <input name="day_of_week" required placeholder="Lundi" />
+              </div>
+              <div class="grid-2">
+                <div class="field">
+                  <label>Début</label>
+                  <input name="start_time" type="time" required />
+                </div>
+                <div class="field">
+                  <label>Fin</label>
+                  <input name="end_time" type="time" required />
+                </div>
+              </div>
+              <div class="field">
+                <label>Salle</label>
+                <input name="room" />
+              </div>
+              <div class="field">
+                <label>Enseignant</label>
+                <input name="teacher" />
+              </div>
+              <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
+          </div>
+          <div class="panel" style="margin: 0">
+            <h2>Info université</h2>
+            <form id="form-admin-info">
+              <div class="field">
+                <label>Catégorie</label>
+                <select name="category">
+                  <option value="general">general</option>
+                  <option value="admission">admission</option>
+                  <option value="services">services</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Titre</label>
+                <input name="title" required />
+              </div>
+              <div class="field">
+                <label>Contenu</label>
+                <textarea name="content" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Publier</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>API REST — Client léger HTML/CSS/JS · Auth JWT</footer>
+
+    <script src="js/config.js"></script>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
